@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Requests & Info</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Movie Requests & Info</h1>
+        </header>
+        <main>
+            <div class="recent-movie recent-movie-left">
+                <h2>Recently Added Movies</h2>
+                <div class="movies-grid">
+                    {% for movie in latest_movies[:6] %}
+                    <div class="movie-item">
+                        <div class="image-container">
+                            <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster">
+                        </div>
+                        <p class="image-caption">{{ movie.title }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="content-container">
+                <div class="available-movies">
+                    <button class="redirect-button" onclick="window.location.href='/current_movies';">Current Movies Available</button>
+                </div>
+                <form class="movie-request-form" method="post" action="/submit">
+                    <h2 style="text-align: center">Movie To Request:</h2>
+                    <div class="input-container">
+                        <input type="text" id="Movie" name="Movie" placeholder="Enter movie title" required>
+                        <input type="submit" value="Submit Request">
+                    </div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </form>
+
+                <div class="current-requests">
+                    <div class="button-container">
+                        <button class="redirect-button" onclick="window.location.href='/all_movies';">Complete Request List</button>
+                        <button id="openAccountModal" class="redirect-button">Request Account</button>
+                    </div>
+                    <h2>Top Requests</h2>
+                    <ul>
+                        {% if movies %}
+                            {% for movie in movies %}
+                                <li>{{ loop.index }}. {{ movie }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <p>No movies found.</p>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="recent-movie recent-movie-right">
+                <h2>Recently Added tvshows</h2>
+                <div class="movies-grid">
+                    {% for tvshow in latest_tvshows %}
+                    <div class="movie-item">
+                        <div class="image-container">
+                            <img src="{{ tvshow.poster_url }}" alt="{{ tvshow.title }} Poster">
+                        </div>
+                        <p class="image-caption">{{ tvshow.title }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+    <div class="Admin">
+            <button class="admin-button" onclick="window.location.href='/login';">Login</button>
+        </div>
+    <!-- Account Request Modal -->
+    <div id="accountModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="account-form-header">
+                <h2>Request a Movie Account</h2>
+            </div>
+            <form id="accountRequestForm">
+                <div class="account-form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your desired username" required>
+                </div>
+                <div class="account-form-group">
+                    <label for="contact">Contact Information</label>
+                    <input type="text" id="contact" name="contact" placeholder="Enter your email or discord" required>
+                </div>
+                <div class="account-form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4" placeholder="How you found this or who referred you" required></textarea>
+                </div>
+                <div class="account-form-button">
+                    <button type="submit">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('accountModal');
+        const openBtn = document.getElementById('openAccountModal');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const form = document.getElementById('accountRequestForm');
+
+        openBtn.onclick = function() {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/request-account', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Account request submitted successfully!');
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    form.reset();
+                } else {
+                    alert('There was an error submitting your request. Please try again.');
+                }
+            } catch (error) {
+                alert('There was an error submitting your request. Please try again.');
+            }
+        }
+    });
+    </script>
+
+</body>
+</html>

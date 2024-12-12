@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Admin.css') }}">
+</head>
+<body>
+    <a href="/" class="home-button">
+        Return Home
+    </a>
+    <div class="container">
+        <div class="movie-section">
+            <h1>Movie List</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movie in movies %}
+                    <tr>
+                        <td>{{ movie[0] }}</td>
+                        <td>{{ movie[1] }}</td>
+                        <td class="action-buttons">
+                            <form action="/delete/{{ movie[0] }}" method="post" class="action-form">
+                                <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                            <form action="/blacklist/{{ movie[1] }}" method="post" class="action-form">
+                                <button type="submit" class="blacklist-btn">Blacklist</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-container">
+            <h2>Approve Request</h2>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <p>{{ request[1] }}</p>
+            </div>
+            <div class="form-group">
+                <label for="contact">Contact Info</label>
+                <p>{{ request[2] }}</p>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <p>{{ request[3] }}</p>
+            </div>
+            {% if request %}
+            <div class="account-submit">
+                <form action="/approve/{{ request[0] }}" method="POST">
+                    <button type="submit">Approve Request</button>
+                </form>
+            </div>
+            {% endif %}
+            <div class="form-buttons">
+                {% if page > 1 %}
+                <a href="{{ url_for('prev_request', page=page) }}"><button>Back</button></a>
+                {% endif %}
+                <a href="{{ url_for('next_request', page=page) }}"><button>Next</button></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

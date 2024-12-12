@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jellyfin Media Browser</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Guide.css') }}">
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-button">Back</a>
+
+        <h1>Jellyfin Media Browser</h1>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search movies and TV shows..." oninput="searchMedia(this.value)">
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showSection('movies')">Movies</button>
+            <button class="tab-button" onclick="showSection('tvshows')">TV Shows</button>
+        </div>
+
+        <div id="movies" class="media-section">
+            <h2>Movies</h2>
+            <div class="media-list">
+                {% for movie in movies %}
+                <div class="media-item" data-title="{{ movie.Name.lower() }}">
+                    <div class="media-id" style="display:none;">{{ movie.Id }}</div>
+                    <div class="media-title">{{ movie.Name }}</div>
+                    <div class="media-info">
+                        {% if movie.ProductionYear %}
+                        <div>{{ movie.ProductionYear }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="media-info">
+                        {% if movie.OfficialRating %}
+                        <div>{{ movie.OfficialRating }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="media-info">
+                        {% if movie.RunTimeTicks %}
+                        <div>{{ (movie.RunTimeTicks / 10000000 / 60)|int }} min</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="tvshows" class="media-section" style="display: none;">
+            <h2>TV Shows</h2>
+            <div class="media-list">
+                {% for show in tv_shows %}
+                <div class="media-item" data-title="{{ show.Name.lower() }}">
+                    <div class="media-id" style="display:none;">{{ show.Id }}</div>
+                    <div class="media-title">{{ show.Name }}</div>
+                    <div class="media-info">
+                        {% if show.ProductionYear %}
+                        <div>{{ show.ProductionYear }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="media-info">
+                        {% if show.OfficialRating %}
+                        <div>{{ show.OfficialRating }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="media-info">
+                        <div>Series</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.media-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Clear search when switching sections
+            document.querySelector('.search-input').value = '';
+            searchMedia('');
+        }
+
+        function searchMedia(query) {
+            query = query.toLowerCase();
+            const activeSection = document.querySelector('.media-section[style="display: block;"]') ||
+                                document.querySelector('.media-section');
+
+            let hasResults = false;
+            activeSection.querySelectorAll('.media-item').forEach(item => {
+                const title = item.getAttribute('data-title');
+                if (title.includes(query)) {
+                    item.style.display = 'grid';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide no results message
+            let noResultsMsg = activeSection.querySelector('.no-results');
+            if (!hasResults) {
+                if (!noResultsMsg) {
+                    noResultsMsg = document.createElement('div');
+                    noResultsMsg.className = 'no-results';
+                    noResultsMsg.textContent = 'No matches found';
+                    activeSection.querySelector('.media-list').after(noResultsMsg);
+                }
+            } else if (noResultsMsg) {
+                noResultsMsg.remove();
+            }
+        }
+    </script>
+</body>
+</html>

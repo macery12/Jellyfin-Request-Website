@@ -1,0 +1,213 @@
+        :root {
+            --primary-color: #60a5fa;
+            --danger-color: #ef4444;
+            --background-color: #111827;
+            --card-background: #1f2937;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --hover-color: #2d3748;
+            --input-background: #2d3748;
+            --border-radius: 8px;
+            --home-button-color: #8b5cf6;
+        }
+
+        /* [Previous styles remain exactly the same] */
+
+        .home-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;  /* Changed from right to left */
+            background-color: var(--home-button-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .home-button {
+                top: 1rem;
+                left: 1rem; /* Changed from right to left */
+            }
+        }
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: system-ui, -apple-system, sans-serif;
+            }
+
+            body {
+                background-color: var(--background-color);
+                color: var(--text-color);
+                padding: 2rem;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 2rem;
+            }
+
+            .movie-section, .form-container {
+                background: var(--card-background);
+                padding: 2rem;
+                border-radius: var(--border-radius);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                border: 1px solid var(--border-color);
+            }
+
+            h1, h2 {
+                color: var(--text-color);
+                margin-bottom: 1.5rem;
+                font-weight: 600;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 1rem;
+            }
+
+            th, td {
+                padding: 1rem;
+                text-align: left;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            th {
+                background-color: var(--input-background);
+                font-weight: 600;
+                color: var(--text-muted);
+            }
+
+            tr:hover {
+                background-color: var(--hover-color);
+            }
+
+            .delete-btn {
+                background-color: var(--danger-color);
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .delete-btn:hover {
+                opacity: 0.9;
+                transform: translateY(-1px);
+            }
+
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+                color: var(--text-muted);
+            }
+
+            .form-group p {
+                padding: 0.75rem;
+                background: var(--input-background);
+                border-radius: 4px;
+                border: 1px solid var(--border-color);
+                color: var(--text-color);
+            }
+
+            button {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-weight: 500;
+            }
+
+            button:hover {
+                opacity: 0.9;
+                transform: translateY(-1px);
+            }
+
+            .form-buttons {
+                display: flex;
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+
+            .account-submit {
+                margin-bottom: 1.5rem;
+            }
+
+            .account-submit button {
+                background-color: #10b981; /* Emerald color for approve button */
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    grid-template-columns: 1fr;
+                }
+
+                body {
+                    padding: 1rem;
+                }
+            }
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.action-form {
+    margin: 0;
+}
+
+.delete-btn, .blacklist-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+.blacklist-btn {
+    background-color: #343a40;
+    color: white;
+}
+
+.blacklist-btn:hover {
+    background-color: #23272b;
+}

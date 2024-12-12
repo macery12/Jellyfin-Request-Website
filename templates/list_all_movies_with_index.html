@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Requests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, rgba(26, 29, 41, 0.97), rgba(37, 40, 55, 0.95));
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            position: relative;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            background-color: #1e1e1e;
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+            font-size: 1.2rem;
+        }
+
+        li:hover {
+            transform: translateX(10px);
+            background-color: #2a2a2a;
+        }
+
+        .back-button {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            padding: 12px 24px;
+            background-color: #2a2a2a;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .back-button:hover {
+            background-color: #404040;
+        }
+
+        .no-movies {
+            text-align: center;
+            color: #cccccc;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-button">← Back</a>
+
+        <main>
+            <div class="current-requests">
+                <h2>Current Requests</h2>
+                <ul>
+                    {% if movies %}
+                        {% for movie in movies %}
+                            <li>{{ movie }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-movies">No movies requested yet.</p>
+                    {% endif %}
+                </ul>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
