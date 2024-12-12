@@ -205,33 +205,34 @@ def admin():
     movies = list_all_diff_movies()
 
     if token:
-
         if verify_token(token):
-
             return render_template('index_Admin.html', movies=movies, request=request_data, page=page)
         else:
-
-            session.pop('user_token', None)
-            flash('Your session has expired. Please log in again.', 'error')
-
-            return redirect('/login')
+            # Session has expired, try to authenticate with the current password
+            password = sanitize_input(request.form.get('password'))
+            if password:
+                new_token = authenticate_user(password)
+                if new_token:
+                    session['user_token'] = new_token
+                    return render_template('index_Admin.html', movies=movies, request=request_data, page=page)
+                else:
+                    flash('Invalid password', 'error')
+                    return redirect('/login')
+            else:
+                flash('Your session has expired. Please log in again.', 'error')
+                return redirect('/login')
     else:
-
         password = sanitize_input(request.form.get('password'))
-    if password:
-        token = authenticate_user(password)
-        if token:
-
-            session['user_token'] = token
-
-            return render_template('index_Admin.html', movies=movies, request=request_data, page=page)
+        if password:
+            token = authenticate_user(password)
+            if token:
+                session['user_token'] = token
+                return render_template('index_Admin.html', movies=movies, request=request_data, page=page)
+            else:
+                flash('Invalid password', 'error')
+                return redirect('/login')
         else:
-
-            flash('Invalid password', 'error')
-
             return redirect('/login')
-    else:
-        return redirect('/login')
 
 @app.route('/next-request/<int:page>')
 @check_token

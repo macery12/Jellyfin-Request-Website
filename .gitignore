@@ -159,3 +159,5 @@ blacklist.db
 movies.db
 log.txt
 .idea/workspace.xml
+accounts.db
+*.py~
