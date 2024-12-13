@@ -179,7 +179,7 @@ def index():
     latest_tvshows = get_latest_tvshows()
     movies = get_top_10_movies()
 
-    return render_template('Index.html',latest_tvshows=latest_tvshows, latest_movies=latest_movies, movies=movies)
+    return render_template('index.html',latest_tvshows=latest_tvshows, latest_movies=latest_movies, movies=movies)
 
 @app.route('/current_movies')
 def current_movies():
