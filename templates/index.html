@@ -31,9 +31,13 @@
                     <button class="redirect-button" onclick="window.location.href='/current_movies';">Current Movies Available</button>
                 </div>
                 <form class="movie-request-form" method="post" action="/submit">
-                    <h2 style="text-align: center">Movie To Request:</h2>
+                    <h2 style="text-align: center">Media To Request:</h2>
                     <div class="input-container">
-                        <input type="text" id="Movie" name="Movie" placeholder="Enter movie title" required>
+                        <input type="text" id="media_title" name="media_title" placeholder="Enter title" required>
+                        <select name="media_type" id="media_type">
+                            <option value="movie">Movie</option>
+                            <option value="series">TV Show</option>
+                        </select>
                         <input type="submit" value="Submit Request">
                     </div>
                     {% with messages = get_flashed_messages(with_categories=true) %}

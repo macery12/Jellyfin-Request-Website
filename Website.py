@@ -317,25 +317,27 @@ def failure():
 @app.route('/submit', methods=['POST'])
 @limiter.limit("5 per minute")  # Rate limit submissions
 def submit():
-    if not request.form.get('Movie'):
-        flash('No movie name provided', 'error')
+    if not request.form.get('media_title'):
+        flash('No title provided', 'error')
         return redirect(url_for('index'))
 
-    movie_name = sanitize_input(request.form.get('Movie'))
-    if not movie_name:
-        flash('Invalid movie name', 'error')
+    media_title = request.form.get('media_title')
+    media_type = request.form.get('media_type')  # Default to movie if not specified
+    print(media_title, media_type)
+    if not media_title:
+        flash('Invalid title', 'error')
         return redirect(url_for('index'))
 
-    # Store the original search query in case we need to display it
-    original_query = movie_name
+    # Store the original search query
+    original_query = media_title
 
-    # Parse movie name and year if provided
+    # Parse title and year if provided
     requested_year = None
-    if '(' in movie_name and ')' in movie_name:
+    if '(' in media_title and ')' in media_title:
         try:
-            requested_year = movie_name[movie_name.rindex('(') + 1:movie_name.rindex(')')]
+            requested_year = media_title[media_title.rindex('(') + 1:media_title.rindex(')')]
             if requested_year.isdigit() and len(requested_year) == 4:
-                movie_name = movie_name[:movie_name.rindex('(')].strip()
+                media_title = media_title[:media_title.rindex('(')].strip()
             else:
                 requested_year = None
         except ValueError:
@@ -346,7 +348,8 @@ def submit():
         flash('API key not configured', 'error')
         return redirect("/")
 
-    search_url = f'http://www.omdbapi.com/?apikey={api_key}&s={movie_name}&type=movie'
+    # Include type in search query
+    search_url = f'http://www.omdbapi.com/?apikey={api_key}&s={media_title}&type={media_type}'
 
     try:
         search_response = requests.get(search_url)
@@ -354,62 +357,76 @@ def submit():
         search_data = search_response.json()
 
         if search_data.get('Response') == 'True':
-            movies = search_data['Search']
+            results = search_data['Search']
 
             # If there's only one version, add it directly
-            if len(movies) == 1:
-                movie_id = movies[0]['imdbID']
-                detail_url = f'http://www.omdbapi.com/?apikey={api_key}&i={movie_id}'
+            if len(results) == 1:
+                media_id = results[0]['imdbID']
+                detail_url = f'http://www.omdbapi.com/?apikey={api_key}&i={media_id}'
                 detail_response = requests.get(detail_url)
-                movie_data = detail_response.json()
+                media_data = detail_response.json()
 
-                if movie_data.get('Response') == 'True':
-                    formatted_title = f"{movie_data['Title']} ({movie_data['Year'].split('–')[0]})"
+                if media_data.get('Response') == 'True':
+                    # Handle different year formats for movies vs TV shows
+                    year = media_data['Year'].split('–')[0] if '–' in media_data['Year'] else media_data['Year']
+                    formatted_title = f"{media_data['Title']} ({year})"
+
                     if is_blacklisted(formatted_title):
                         flash(f'"{formatted_title}" is blacklisted and cannot be added', 'error')
                     else:
-                        add_movie(formatted_title)
-                        flash(f'Successfully added "{formatted_title}"', 'success')
+                        if media_type == 'series':
+                            add_movie(formatted_title)  # You'll need to create this function
+                            flash(f'Successfully added TV show "{formatted_title}"', 'success')
+                        else:
+                            add_movie(formatted_title)
+                            flash(f'Successfully added movie "{formatted_title}"', 'success')
                     return redirect("/")
 
             # For multiple versions, store them in session and redirect to selection page
-            movie_versions = []
-            for movie in movies:
-                movie_id = movie['imdbID']
-                detail_url = f'http://www.omdbapi.com/?apikey={api_key}&i={movie_id}'
+            media_versions = []
+            for item in results:
+                media_id = item['imdbID']
+                detail_url = f'http://www.omdbapi.com/?apikey={api_key}&i={media_id}'
                 detail_response = requests.get(detail_url)
-                movie_detail = detail_response.json()
+                media_detail = detail_response.json()
 
-                if movie_detail.get('Response') == 'True':
-                    movie_versions.append({
-                        'id': movie_id,
-                        'title': movie_detail['Title'],
-                        'year': movie_detail['Year'].split('–')[0],
-                        'poster': movie_detail.get('Poster', 'N/A'),
-                        'plot': movie_detail.get('Plot', 'No plot available'),
-                        'director': movie_detail.get('Director', 'Unknown'),
-                        'actors': movie_detail.get('Actors', 'Unknown')
+                if media_detail.get('Response') == 'True':
+                    # Handle different year formats
+                    year = media_detail['Year'].split('–')[0] if '–' in media_detail['Year'] else media_detail['Year']
+
+                    media_versions.append({
+                        'id': media_id,
+                        'title': media_detail['Title'],
+                        'year': year,
+                        'poster': media_detail.get('Poster', 'N/A'),
+                        'plot': media_detail.get('Plot', 'No plot available'),
+                        'director': media_detail.get('Director', 'Unknown'),
+                        'actors': media_detail.get('Actors', 'Unknown'),
+                        'type': media_detail.get('Type', media_type),
+                        'total_seasons': media_detail.get('totalSeasons', 'N/A') if media_type == 'series' else None
                     })
 
             # Sort by year, most recent first
-            movie_versions.sort(key=lambda x: x['year'], reverse=True)
-
+            media_versions.sort(key=lambda x: x['year'], reverse=True)
+            print(media_versions)
             # Store in session and redirect to selection page
-            session['movie_versions'] = movie_versions
+            session['media_versions'] = media_versions
             session['original_query'] = original_query
+            session['media_type'] = media_type
             return redirect(url_for('select_version'))
         else:
-            flash(f'Movie "{movie_name}" not found. Check spelling?', 'error')
+            media_type_str = 'TV show' if media_type == 'series' else 'movie'
+            flash(f'{media_type_str} "{media_title}" not found. Check spelling?', 'error')
 
     except requests.RequestException as e:
-        flash(f'Error checking movie: {str(e)}', 'error')
+        flash(f'Error checking media: {str(e)}', 'error')
 
     return redirect("/")
 
 
 @app.route('/select_version')
 def select_version():
-    movie_versions = session.get('movie_versions', [])
+    movie_versions = session.get('media_versions', [])
     original_query = session.get('original_query', '')
     if not movie_versions:
         flash('No movie versions found', 'error')
@@ -419,7 +436,7 @@ def select_version():
 
 @app.route('/add_version', methods=['POST'])
 def add_version():
-    movie_versions = session.get('movie_versions', [])
+    movie_versions = session.get('media_versions', [])
     selected_id = sanitize_input(request.form.get('movie_id'))
 
     selected_movie = next((movie for movie in movie_versions if movie['id'] == selected_id), None)
@@ -437,7 +454,7 @@ def add_version():
         flash('Selected movie version not found', 'error')
 
     # Clear the session data
-    session.pop('movie_versions', None)
+    session.pop('media_versions', None)
     session.pop('original_query', None)
     return redirect('/')
 

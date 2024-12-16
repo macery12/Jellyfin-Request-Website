@@ -183,6 +183,10 @@
                         <p><strong>Director:</strong> {{ movie.director }}</p>
                         <p><strong>Cast:</strong> {{ movie.actors }}</p>
                         <p><strong>Plot:</strong> {{ movie.plot }}</p>
+                        {% if movie.total_seasons %}
+                        <p><strong>seasons:</strong> {{ movie.total_seasons }}</p>
+                        {% endif %}
+                        <p><strong>actors: </strong> {{ movie.actors }}</p>
                         <button type="submit" class="select-btn">Select This Version</button>
                     </div>
                 </form>

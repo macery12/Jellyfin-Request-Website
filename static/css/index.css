@@ -542,3 +542,23 @@
     transform: translateY(-2px);
     box-shadow: var(--box-shadow);
 }
+.input-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+#media_type {
+    padding: 8px;
+    border-radius: 4px;
+    border: var(--secondary-bg);
+    background-color: #333;  /* Dark theme */
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+#media_type:focus {
+    outline: none;
+    border-color: #666;
+}
