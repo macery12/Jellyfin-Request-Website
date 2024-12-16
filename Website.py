@@ -94,7 +94,7 @@ def get_jellyfin_headers():
         'Content-Type': 'application/json'
     }
 
-def get_movies():
+def get_movies(timeout=10):
     url = f"{JELLYFIN_URL}/Users/{USER_ID}/Items/"
     params = {
         'IncludeItemTypes': 'Movie',
@@ -102,10 +102,18 @@ def get_movies():
         'SortBy': 'SortName',
         'SortOrder': 'Ascending'
     }
-    response = requests.get(url, headers=get_jellyfin_headers(), params=params)
-    return response.json().get('Items', [])
+    try:
+        response = requests.get(url, headers=get_jellyfin_headers(), params=params, timeout=timeout)
+        response.raise_for_status()
+        return response.json().get('Items', [])
+    except requests.Timeout:
+        print(f"Request timed out after {timeout} seconds while fetching movies")
+        return []
+    except requests.RequestException as e:
+        print(f"Error fetching movies: {e}")
+        return []
 
-def get_tv_shows():
+def get_tv_shows(timeout=10):
     url = f"{JELLYFIN_URL}/Users/{USER_ID}/Items"
     params = {
         'IncludeItemTypes': 'Series',
@@ -114,38 +122,51 @@ def get_tv_shows():
         'SortOrder': 'Ascending'
     }
     try:
-        response = requests.get(url, headers=get_jellyfin_headers(), params=params)
+        response = requests.get(url, headers=get_jellyfin_headers(), params=params, timeout=timeout)
         response.raise_for_status()
         return response.json().get('Items', [])
-    except requests.exceptions.RequestException as e:
+    except requests.Timeout:
+        print(f"Request timed out after {timeout} seconds while fetching TV shows")
+        return []
+    except requests.RequestException as e:
         print(f"Error fetching TV shows: {e}")
         return []
 
-def get_latest_movies():
+def get_latest_movies(timeout=10):
     url = f"{JELLYFIN_URL}/Users/{USER_ID}/Items/Latest?IncludeItemTypes=Movie&Limit=6"
     headers = {'X-Emby-Token': API_KEY}
-    response = requests.get(url, headers=headers)
-
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, headers=headers, timeout=timeout)
+        response.raise_for_status()
         movies = response.json()
         return [{
             "title": movie['Name'],
             "poster_url": f"{JELLYFIN_URL}/Items/{movie['Id']}/Images/Primary?maxWidth=300"
         } for movie in movies]
-    return []
+    except requests.Timeout:
+        print(f"Request timed out after {timeout} seconds while fetching latest movies")
+        return []
+    except requests.RequestException as e:
+        print(f"Error fetching latest movies: {e}")
+        return []
 
-def get_latest_tvshows():
+def get_latest_tvshows(timeout=10):
     url = f"{JELLYFIN_URL}/Users/{USER_ID}/Items/Latest?IncludeItemTypes=Series&Limit=6"
     headers = {'X-Emby-Token': API_KEY}
-    response = requests.get(url, headers=headers)
-
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, headers=headers, timeout=timeout)
+        response.raise_for_status()
         tvshows = response.json()
         return [{
             "title": tvshow['Name'],
             "poster_url": f"{JELLYFIN_URL}/Items/{tvshow['Id']}/Images/Primary?maxWidth=300"
         } for tvshow in tvshows]
-    return []
+    except requests.Timeout:
+        print(f"Request timed out after {timeout} seconds while fetching latest TV shows")
+        return []
+    except requests.RequestException as e:
+        print(f"Error fetching latest TV shows: {e}")
+        return []
 
 # === Utility Functions ===
 def sanitize_input(text):
