@@ -323,7 +323,7 @@ def submit():
 
     media_title = request.form.get('media_title')
     media_type = request.form.get('media_type')  # Default to movie if not specified
-    print(media_title, media_type)
+
     if not media_title:
         flash('Invalid title', 'error')
         return redirect(url_for('index'))
@@ -408,7 +408,7 @@ def submit():
 
             # Sort by year, most recent first
             media_versions.sort(key=lambda x: x['year'], reverse=True)
-            print(media_versions)
+
             # Store in session and redirect to selection page
             session['media_versions'] = media_versions
             session['original_query'] = original_query
