@@ -242,7 +242,7 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: bold;
-            color: var(--accent-secondary);
+            color: var(--text-primary);
         }
 
         .account-form-button button {
@@ -521,3 +521,24 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+.contact-button {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 1rem auto;
+    background: var(--secondary-bg);
+    color: var(--accent-secondary);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+}
+
+.contact-button:hover {
+    background: #222222;
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow);
+}

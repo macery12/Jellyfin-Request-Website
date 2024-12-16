@@ -15,7 +15,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 # Local imports
-from DB import *  # Note: Consider specific imports instead of wildcard
+from DB import *
 
 # === Application Initialization ===
 app = Flask(__name__)
@@ -26,7 +26,6 @@ bcrypt = Bcrypt(app)
 JELLYFIN_URL = os.getenv("JELLYFIN_URL")
 API_KEY = os.getenv("API_KEY")
 USER_ID = os.getenv("USER_ID")
-AGENT_NAME = os.getenv("AGENT_NAME")  # Note: This variable appears unused
 app.secret_key = os.getenv("SECRET_KEY")
 hashed_password = os.getenv("PASSWORD_HASH")
 
@@ -168,7 +167,6 @@ def blacklist_movie(name):
 
     movie_id = get_movie_id_by_name(name)
 
-    # You'll need to create this function
     if movie_id:
         delete_movie_by_id(movie_id)
 

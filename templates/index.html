@@ -81,7 +81,20 @@
     </div>
     <div class="Admin">
             <button class="admin-button" onclick="window.location.href='/login';">Login</button>
+            <button class="contact-button">Contact Me</button>
         </div>
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeContactModal">&times;</span>
+            <div class="account-form-header">
+                <h2>Contact Information</h2>
+            </div>
+            <div style="text-align: center; margin: 2rem 0;">
+                <p>Email: <span id="emailText">contact@macery12.xyz</span></p>
+             <button id="copyEmail" class="contact-button" style="margin-top: 1rem;">Copy Email</button>
+            </div>
+        </div>
+    </div>
     <!-- Account Request Modal -->
     <div id="accountModal" class="modal">
         <div class="modal-content">
@@ -109,54 +122,92 @@
         </div>
     </div>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('accountModal');
-        const openBtn = document.getElementById('openAccountModal');
-        const closeBtn = document.getElementsByClassName('close')[0];
-        const form = document.getElementById('accountRequestForm');
+        document.addEventListener('DOMContentLoaded', function() {
+    // Account Modal Elements
+    const accountModal = document.getElementById('accountModal');
+    const openAccountBtn = document.getElementById('openAccountModal');
+    const closeAccountBtn = accountModal.querySelector('.close');
+    const accountForm = document.getElementById('accountRequestForm');
 
-        openBtn.onclick = function() {
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
+    // Contact Modal Elements
+    const contactModal = document.getElementById('contactModal');
+    const contactBtn = document.querySelector('.contact-button');
+    const closeContactBtn = document.getElementById('closeContactModal');
+    const copyEmailBtn = document.getElementById('copyEmail');
+    const emailText = document.getElementById('emailText');
 
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
+    // Account Modal Functions
+    openAccountBtn.onclick = function() {
+        accountModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeAccountBtn.onclick = function() {
+        accountModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Contact Modal Functions
+    contactBtn.onclick = function() {
+        contactModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeContactBtn.onclick = function() {
+        contactModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    copyEmailBtn.onclick = function() {
+        navigator.clipboard.writeText(emailText.textContent).then(function() {
+            copyEmailBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyEmailBtn.textContent = 'Copy Email';
+            }, 2000);
+        }).catch(function(err) {
+            console.error('Failed to copy text: ', err);
+        });
+    }
+
+    // Unified window click handler for both modals
+    window.onclick = function(event) {
+        if (event.target == accountModal) {
+            accountModal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
+        if (event.target == contactModal) {
+            contactModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
+    }
 
-        form.onsubmit = async function(e) {
-            e.preventDefault();
+    // Account Form Submit Handler
+    accountForm.onsubmit = async function(e) {
+        e.preventDefault();
 
-            const formData = new FormData(form);
+        const formData = new FormData(accountForm);
 
-            try {
-                const response = await fetch('/request-account', {
-                    method: 'POST',
-                    body: formData
-                });
+        try {
+            const response = await fetch('/request-account', {
+                method: 'POST',
+                body: formData
+            });
 
-                if (response.ok) {
-                    alert('Account request submitted successfully!');
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                    form.reset();
-                } else {
-                    alert('There was an error submitting your request. Please try again.');
-                }
-            } catch (error) {
+            if (response.ok) {
+                alert('Account request submitted successfully!');
+                accountModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                accountForm.reset();
+            } else {
                 alert('There was an error submitting your request. Please try again.');
             }
+        } catch (error) {
+            alert('There was an error submitting your request. Please try again.');
         }
-    });
+    }
+});
     </script>
+
 
 </body>
 </html>
